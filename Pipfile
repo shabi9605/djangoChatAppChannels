@@ -12,7 +12,12 @@ django-environ = "*"
 django-extensions = "*"
 gunicorn = "*"
 ipython = "*"
-psycopg2 = "*"
+channels = "*"
+mysqlclient = "*"
+django-crispy-forms = "*"
+crispy-bootstrap4 = "*"
+daphne = "*"
+channels-redis = "*"
 
 [dev-packages]
 yapf = "*"
