@@ -64,15 +64,15 @@
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
             console.log("data = ",data)
-            if(data.user == userName){
+            if(data.sender == userName){
                 console.log("hihih");
-                $('#chat-log').html(`<div class="my_msg_div">
+                $('#chat-log').append(`<div class="my_msg_div">
                     <p >${data.message}</p>
                 </div>`);
             }
             else{
                 console.log("hh");
-                $('#chat-log').html(`<div class="sender_msg_div">
+                $('#chat-log').append(`<div class="sender_msg_div">
                     <p >${data.message}</p>
                 </div>`);
             }
@@ -97,7 +97,7 @@
             const message = messageInputDom.value;
             chatSocket.send(JSON.stringify({
                 'message': message,
-                'sending_type': sending_type
+                'sender': userName
             }));
             messageInputDom.value = '';
         };
