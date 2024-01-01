@@ -2,12 +2,17 @@ import json
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-
+from . models import RoomMember
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
+
+        member, created = RoomMember.objects.get_or_create(
+            user=self.scope["user"],
+            room_name = self.scope["url_route"]["kwargs"]["room_name"]
+        )
 
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
@@ -17,8 +22,15 @@ class ChatConsumer(WebsocketConsumer):
         self.accept()
 
     def disconnect(self, close_code):
+
+        member = RoomMember.objects.get(
+            user = self.scope["user"],
+            room_name = self.scope["url_route"]["kwargs"]["room_name"]
+        )
+        member.delete()
         # Leave room group
         async_to_sync(self.channel_layer.group_discard)(
+           
             self.room_group_name, self.channel_name
         )
 

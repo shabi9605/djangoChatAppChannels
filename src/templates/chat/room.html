@@ -11,16 +11,33 @@
 
 </head>
 <style>
+    .main_div{
+        background-color: white;
+        min-height: 100vh;
+        display: flex;
+    }
+    .left_div{
+        width: 35%;
+    }
+
+    .right_div{
+        background-color: rgb(203, 223, 225);
+        width: 100%;
+    }
     .chat-log{
-        min-height: 8em;
         width: 90%;
-        border: 1px solid black;
         margin-bottom: 1em;
         margin: 5em;
+        height: auto;
+        overflow: hidden;
+        padding-bottom: 2em;
+        min-height: 100%;
+        background: #bddbe7;
+        margin-top: 0;
     }
 
     .my_msg_div{
-        display: flex;
+        display: grid;
         align-items: end;
         justify-content: end;
         float: right;
@@ -29,26 +46,128 @@
     }
 
     .sender_msg_div{
-        display: flex;
+        display: grid;
         width: 100%;
         padding: 0;
     }
+
+    .p_tag{
+        padding: 0;
+        margin: 0;
+    }
+
+    .p_msg_tag{
+        display: flex;
+        align-items: end;
+        justify-content: end;
+        float: right;
+
+    }
+
+    .msg-wrpper-div{
+        background-color: white;
+        padding: 5px;
+        margin: 5px;
+        border-radius: 7px;
+        position: relative;
+        width: fit-content;
+    }
+
+    .my-wrpper-div::before{
+        content: '';
+        position: absolute;
+        bottom: -7px;
+        right: -4px;
+        border: 8px solid transparent;
+        border-top: 8px solid #fff;
+    }
+
+    .my-wrpper-div{
+        padding-bottom: 5px;
+        padding-right: 9px;
+        
+    }
+
+    .sender-wrpper-div::before{
+        content: '';
+        position: absolute;
+        bottom: -7px;
+        left: -5px;
+        border: 8px solid transparent;
+        border-top: 8px solid #fff;
+    }
+
+    .sender-wrpper-div{
+        padding-bottom: 5px;
+        padding-right: 9px;
+        
+    }
+
+    .input-div{
+        position: fixed;
+        bottom: 0;
+        background-color: #ededed;
+        width: 100%;
+        padding-left: 5em;
+        padding-top: 2em;
+    }
+
+    .user-name-div{
+        height: 3em;
+        background-color: #ceffef;
+        display: flex;
+        align-items: center;
+        padding-top: 1em;
+        margin-bottom: 0.5em;
+        padding-left: 0.5em;
+    }
+
 
 
 </style>
 
 <body>
-    <div id="chat-log" class="chat-log">
+    <div class="main_div">
+        <div class="left_div">
+            <h3>Room Users</h3>
+            {% for i in room_users %}
+            <div class="user-name-div">
+                <p>{{i.user.username}}</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="right_div">
+
+            <div id="chat-log" class="chat-log">
        
         
         
+            </div>
+            <div class="input-div">
+                <input id="chat-message-input" type="text" size="100"><br>
+                <input id="chat-message-submit" type="button" value="Send">
+            </div>
+            
+            {{ room_name|json_script:"room-name" }}
+            {{ user.username|json_script:"user-name" }}
+
+        </div>
     </div>
-    <!-- <textarea  cols="100" rows="20"></textarea><br> -->
-    <input id="chat-message-input" type="text" size="100"><br>
-    <input id="chat-message-submit" type="button" value="Send">
-    {{ room_name|json_script:"room-name" }}
-    {{ user.username|json_script:"user-name" }}
+    
     <script>
+        $(document).ready(function(){
+            if (!localStorage.getItem("reload")) {
+                /* set reload to true and then reload the page */
+                localStorage.setItem("reload", "true");
+                location.reload();
+            }
+            /* after reloading remove "reload" from localStorage */
+            else {
+                localStorage.removeItem("reload");
+                // localStorage.clear(); // or clear it, instead
+            }
+        });
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
         const userName = JSON.parse(document.getElementById('user-name').textContent);
         var  sending_type = "receiver";
@@ -67,13 +186,19 @@
             if(data.sender == userName){
                 console.log("hihih");
                 $('#chat-log').append(`<div class="my_msg_div">
-                    <p >${data.message}</p>
+                    <div class='msg-wrpper-div my-wrpper-div'>
+                        <p class='p_tag'>${userName}</p>
+                        <p class='p_tag p_msg_tag'>${data.message}</p>
+                    </div>
                 </div>`);
             }
             else{
                 console.log("hh");
                 $('#chat-log').append(`<div class="sender_msg_div">
-                    <p >${data.message}</p>
+                    <div class='msg-wrpper-div sender-wrpper-div'>
+                        <p class='p_tag'>${data.sender}</p>
+                        <p class='p_tag p_sender_msg_tag'>${data.message}</p>
+                    </div>
                 </div>`);
             }
             
@@ -101,6 +226,13 @@
             }));
             messageInputDom.value = '';
         };
+
+        // function deleteMember(){
+        //     window.location.href = `/chat/delete_member/`;
+        // }
+        // window.addEventListener('beforeunload',deleteMember)
+
+        // $("#leave-room").click(deleteMember)
     </script>
 </body>
 
